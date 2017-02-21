@@ -3,7 +3,15 @@ var app = express()
 
 app.get('/', function (req, res){
   var h = req.headers
-  res.send({'ip-address': h['x-forwarded-for'], 
+  var ip;
+  if (h['x-forwarded-for']) {
+      ip = h['x-forwarded-for'].split(",")[0];
+  } else if (req.connection && req.connection.remoteAddress) {
+      ip = req.connection.remoteAddress;
+  } else {
+      ip = req.ip;
+  }
+  res.send({'ip-address': ip, 
     language : h['accept-language'].split(',')[0],
     'operating-system': h['user-agent'].slice(h['user-agent'].indexOf('(') + 1, h['user-agent'].indexOf(')'))
   })
